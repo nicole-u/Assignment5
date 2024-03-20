@@ -45,7 +45,7 @@ class Body(tk.Frame):
         self.message_editor.insert(1.0, text)
 
     def _draw(self):
-        posts_frame = tk.Frame(master=self, width=250)
+        posts_frame = tk.Frame(master=self, width=250, bg="#3ba39e")
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         self.posts_tree = ttk.Treeview(posts_frame)
@@ -53,30 +53,30 @@ class Body(tk.Frame):
         self.posts_tree.pack(fill=tk.BOTH, side=tk.TOP,
                              expand=True, padx=5, pady=5)
 
-        entry_frame = tk.Frame(master=self, bg="")
+        entry_frame = tk.Frame(master=self, bg="#3ba39e")
         entry_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 
-        editor_frame = tk.Frame(master=entry_frame, bg="red")
+        editor_frame = tk.Frame(master=entry_frame, bg="#3ba39e")
         editor_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
-        scroll_frame = tk.Frame(master=entry_frame, bg="blue", width=10)
+        scroll_frame = tk.Frame(master=entry_frame, bg="#3ba39e", width=10)
         scroll_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=False)
 
-        message_frame = tk.Frame(master=self, bg="yellow")
+        message_frame = tk.Frame(master=self, bg="#3ba39e")
         message_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
-        self.message_editor = tk.Text(message_frame, width=0, height=5)
+        self.message_editor = tk.Text(message_frame, width=0, height=5, bg="#cbf2ee", font="bahnschrift 12")
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5)
+        self.entry_editor = tk.Text(editor_frame, width=0, height=5, bg="#aaf0ec", font="bahnschrift 12")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                expand=True, padx=0, pady=0)
 
         entry_editor_scrollbar = tk.Scrollbar(master=scroll_frame,
-                                              command=self.entry_editor.yview)
+                                              command=self.entry_editor.yview, bg="#3ba39e")
         self.entry_editor['yscrollcommand'] = entry_editor_scrollbar.set
         entry_editor_scrollbar.pack(fill=tk.Y, side=tk.LEFT,
                                     expand=False, padx=0, pady=0)
@@ -94,13 +94,13 @@ class Footer(tk.Frame):
             self._send_callback()
 
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
+        save_button = tk.Button(master=self, text="Send", width=15, bg="#195e5b", fg="white", font="bahnschrift 10", command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
         save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
-        self.footer_label = tk.Label(master=self, text="Ready.")
+        self.footer_label = tk.Label(master=self, bg="#cbf2ee", text="Ready.", font="bahnschrift 10")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
 
 
@@ -125,8 +125,12 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.username_entry.insert(tk.END, self.user)
         self.username_entry.pack()
 
-        self.password_entry = tk.Entry(frame, width=30, text="Password:")
+        self.password_label = tk.Label(frame, width=30, text="Password")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(frame, width=30)
         self.password_entry['show'] = "*"
+        self.password_entry.insert(tk.END, self.pwd)
+        self.password_entry.pack()
         # You need to implement also the region for the user to enter
         # the Password. The code is similar to the Username you see above
         # but you will want to add self.password_entry['show'] = '*'
@@ -164,6 +168,7 @@ class MainApp(tk.Frame):
         self.direct_messenger.send()
 
     def add_contact(self):
+        
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
@@ -185,7 +190,7 @@ class MainApp(tk.Frame):
         self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
-        # You must implement this!
+        print(self.after(5000, self.direct_messenger.retrieve_new()))
         pass
 
     def _draw(self):
