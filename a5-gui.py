@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
+from ds_messenger import DirectMessenger
 from typing import Text
 
 
@@ -148,6 +149,7 @@ class MainApp(tk.Frame):
         self.password = None
         self.server = None
         self.recipient = None
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -159,8 +161,7 @@ class MainApp(tk.Frame):
         self.body.insert_contact("studentexw23") # adding one example student.
 
     def send_message(self):
-        # You must implement this!
-        pass
+        self.direct_messenger.send()
 
     def add_contact(self):
         # You must implement this!
@@ -178,13 +179,10 @@ class MainApp(tk.Frame):
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
-        # You must implement this!
-        # You must configure and instantiate your
-        # DirectMessenger instance after this line.
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
 
     def publish(self, message:str):
-        # You must implement this!
-        pass
+        self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
         # You must implement this!
@@ -213,7 +211,7 @@ class MainApp(tk.Frame):
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.send_message)
+        self.footer = Footer(self.root, send_callback=self.publish)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 
@@ -226,7 +224,7 @@ if __name__ == "__main__":
 
     # This is just an arbitrary starting point. You can change the value
     # around to see how the starting size of the window changes.
-    main.geometry("1024x768")
+    main.geometry("1024x700")
 
     # adding this option removes some legacy behavior with menus that
     # some modern OSes don't support. If you're curious, feel free to comment

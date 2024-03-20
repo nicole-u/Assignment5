@@ -18,7 +18,6 @@ import json
 import socket
 import time
 from collections import namedtuple
-import ds_messenger as dsm
 
 # Namedtuple to hold the values retrieved from json messages.
 DataTuple = namedtuple('DataTuple', ['type', 'message', 'token'])
@@ -81,21 +80,22 @@ def _join(client_socket: socket, user: str, pwd: str):
     # print("Token:" + token)
     return extracted_msg
 
-def directmessage(dm, recipient, user, pwd):
+def directmessage(dm, recipient, dsuserver, user, pwd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        client.connect(("168.235.86.101", 3021))
+        client.connect((dsuserver, 3021))
         server_msg = _join(client, user, pwd)
-        msg_info = []
-        for item in server_msg:
-            msg_info.append(item)
-        print(msg_info)
-        msg_token = msg_info[2]
-        formatted_post = {"token": msg_token, "directmessage": {"entry": dm, "recipient": recipient, "timestamp": str(time.time())}}
-        print(formatted_post)
+        msg_token = server_msg[2]
+
+        timestamp = str(time.time())
+        formatted_post = {"token": msg_token, "directmessage": {"entry": dm, "recipient": recipient, "timestamp": timestamp}}
         sendfile = client.makefile('w')
         recv = client.makefile('r')
         sendfile.write(json.dumps(formatted_post) + "\r\n")
         sendfile.flush()
-        print(recv.readline)
+        server_resp = json.loads(recv.readline())
+        if server_resp["response"]["type"] == "ok":
+            return "Direct message successfuly sent", msg_token
+        else:
+            print("Error sending direct message.")
 
-print(directmessage("Hello world", "ohhimark", "strawberry", "banana"))
+#directmessage("Hello world", "ohhimark", "168.235.86.101", "strawberry", "banana")
