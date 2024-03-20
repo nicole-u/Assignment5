@@ -52,19 +52,15 @@ def join(client_socket: socket, user: str, pwd: str):
     """
     sendfile = client_socket.makefile('w')
     recv = client_socket.makefile('r')
-
     msg = {"join": {"username": user, "password": pwd, "token": ""}}
-    # print(message)
     sendfile.write(json.dumps(msg) + "\r\n")
     sendfile.flush()
-
     server_msg = recv.readline()
     extracted_msg = dsp.extract_json(server_msg)
-    # print(extracted_msg)
     msg_type = extracted_msg[0]
+    messages = extracted_msg[1]
     token = extracted_msg[2]
-    # print("Token:" + token)
-    return msg_type, token
+    return msg_type, messages, token
 
 
 def post(client_socket: socket, user_post, user_token):

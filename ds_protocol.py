@@ -16,8 +16,9 @@ in ds_client.py
 
 import json
 import socket
+import time
 from collections import namedtuple
-import ds_client as dsc
+import ds_messenger as dsm
 
 # Namedtuple to hold the values retrieved from json messages.
 DataTuple = namedtuple('DataTuple', ['type', 'message', 'token'])
@@ -61,8 +62,40 @@ def extract_json_to_list(json_msg: str):
         print("Json cannot be decoded.")
     return json_info
 
+def _join(client_socket: socket, user: str, pwd: str):
+    """
+    This function connects the client code to the server.
+    Takes client_socket, username, and password.
+    """
+    sendfile = client_socket.makefile('w')
+    recv = client_socket.makefile('r')
 
-def directmessage(dm: dict, user, pwd):
+    msg = {"join": {"username": user, "password": pwd, "token": ""}}
+    # print(message)
+    sendfile.write(json.dumps(msg) + "\r\n")
+    sendfile.flush()
+
+    server_msg = recv.readline()
+    extracted_msg = extract_json(server_msg)
+    # print(extracted_msg)
+    # print("Token:" + token)
+    return extracted_msg
+
+def directmessage(dm, recipient, user, pwd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        msg_info = dsc.join(client, user, pwd)
+        client.connect(("168.235.86.101", 3021))
+        server_msg = _join(client, user, pwd)
+        msg_info = []
+        for item in server_msg:
+            msg_info.append(item)
         print(msg_info)
+        msg_token = msg_info[2]
+        formatted_post = {"token": msg_token, "directmessage": {"entry": dm, "recipient": recipient, "timestamp": str(time.time())}}
+        print(formatted_post)
+        sendfile = client.makefile('w')
+        recv = client.makefile('r')
+        sendfile.write(json.dumps(formatted_post) + "\r\n")
+        sendfile.flush()
+        print(recv.readline)
+
+print(directmessage("Hello world", "ohhimark", "strawberry", "banana"))

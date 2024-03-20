@@ -239,3 +239,6 @@ def post_online(path, filename, post: str):
         dsc.send(server, DSU_PORT, current_user, current_pwd, transcluded_post, current_bio)
     else:
         dsc.send(server, DSU_PORT, current_user, current_pwd, transcluded_post)
+
+def direct_message():
+    pass

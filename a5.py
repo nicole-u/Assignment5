@@ -55,7 +55,9 @@ def print_and_edit(filepath, filename):
     loop that lets the user print and edit
     their DSU file properties.
     """
-    user_action = input("Would you like to print (P) or edit (E)? Type 'out' to exit.\n")
+    print("New feature! You can now direct message other users on the server.")
+    print("The command for this is 'dm'.")
+    user_action = input("Would you like to print (P),  edit (E), or DM (dm)? Type 'out' to exit.\n")
     user_action = user_action.upper()
     while user_action != "OUT":
         if user_action == "P":
