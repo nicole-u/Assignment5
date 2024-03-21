@@ -23,12 +23,12 @@ class DirectMessenger:
         self.port = 3021
 
     def send(self, message:str, recipient:str) -> bool:
-        #try:
+        try:
             dm_attempt = dsp.directmessage(message, recipient, self.dsuserver, self.username, self.password)
             print(dm_attempt[0])
             self.token = dm_attempt[1]
             return True
-        #except:
+        except:
             print("Error with sending direct message.")
             return False
 
@@ -47,8 +47,7 @@ class DirectMessenger:
                 server_response = recv.readline()
                 response = json.loads(server_response)
                 if server_response["response"]["type"] == 'ok':
-                    all_messages = server_response["response"]["messages"]
-                    #print(all_messages)
+                    all_messages = response["response"]["messages"]
                     msg_list = []
                     i = 0
                     for msg in all_messages:
@@ -106,8 +105,11 @@ class DirectMessenger:
 if __name__ == "__main__":
     dm_time2 = DirectMessenger("168.235.86.101", "strawberry", "banana")
     #print("Class instantiated")
-    dm_time2.send("yippee", "teatime")
+    input = input("What do you want to send to teatime?")
+    dm_time2.send(input, "teatime")
     all_msgs = dm_time2.retrieve_all()
     print(all_msgs)
-    new_msgs = dm_time2.retrieve_new()
-    print(new_msgs)
+
+    dm_time1 = DirectMessenger("168.235.86.101", "teatime", "iceecream")
+    all_msgs = dm_time1.retrieve_all()
+    print(all_msgs)

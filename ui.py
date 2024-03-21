@@ -44,7 +44,7 @@ def c_command(directoryPath, file_name):
         new_file = open(p, "x")
         profile.dsuserver = str(input("What server would you like to save to?\n"))
         profile.save_profile(filepath)
-        print(f"{filepath} created\n")
+        print(f"{filepath} created.\n")
 
 
 def o_command(path, filename):
@@ -239,9 +239,3 @@ def post_online(path, filename, post: str):
         dsc.send(server, DSU_PORT, current_user, current_pwd, transcluded_post, current_bio)
     else:
         dsc.send(server, DSU_PORT, current_user, current_pwd, transcluded_post)
-
-def direct_message():
-    """
-    Handles all communication with tkinter and messenger.
-    """
-    pass

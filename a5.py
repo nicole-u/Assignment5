@@ -10,6 +10,7 @@
 
 from Profile import *
 import ui
+import a5_gui as gui
 
 ACCEPTED_P_OPTIONS = ["-usr", "-pwd", "-bio", "-posts", "-post", "-all", "done"]
 ACCEPTED_E_OPTIONS = ["-usr", "-pwd", "-bio", "-addpost", "-delpost", "done"]
@@ -91,4 +92,5 @@ def print_and_edit(filepath, filename):
 
 
 if __name__ == "__main__":
+    gui.main()
     welcome()
