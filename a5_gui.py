@@ -6,6 +6,10 @@ from Profile import Profile
 
 
 class Body(tk.Frame):
+    """
+    The class that's responsible for drawing the main body
+    of the GUI.
+    """
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
@@ -33,10 +37,10 @@ class Body(tk.Frame):
         id = self.posts_tree.insert('', id, id, text=contact)
 
     def insert_user_message(self, message: str):
-        self.entry_editor.insert(1.0, message + '\n', 'entry-right')
+        self.entry_editor.insert(tk.END, message + '\n', 'entry-right')
 
     def insert_contact_message(self, message: str):
-        self.entry_editor.insert(1.0, message + '\n', 'entry-left')
+        self.entry_editor.insert(tk.END, message + '\n', 'entry-left')
 
     def get_text_entry(self) -> str:
         return self.message_editor.get('1.0', 'end').rstrip()
@@ -50,7 +54,7 @@ class Body(tk.Frame):
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         style = ttk.Style()
-        style.configure("Treeview", background="#b0d6d4", font="bahnschrift 12")
+        style.configure("Treeview", background="#cbf2ee", fieldbackground="#b0d6d4", font="bahnschrift 12")
         self.posts_tree = ttk.Treeview(posts_frame, style="Treeview")
         self.posts_tree.bind("<<TreeviewSelect>>", self.node_select)
         self.posts_tree.pack(fill=tk.BOTH, side=tk.TOP,
@@ -144,12 +148,12 @@ class NewContactDialog(tk.simpledialog.Dialog):
 class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
-        self._get_profile()
         self.root = root
         self.username = None
         self.password = None
-        self.server = None
+        self.server = "168.235.86.101"
         self.recipient = None
+        self._get_profile()
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
@@ -159,15 +163,21 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
+        profile.load_profile(self.filepath)
+        for contact in self.contacts:
+            self.body.insert_contact(contact)
         self.body.insert_contact("studentexw23")  # adding one example student.
 
     def send_message(self):
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         message = self.body.get_text_entry()
+        # print(message)
         self.direct_messenger.send(message, self.recipient)
         self.body.insert_user_message(message)
         self.body.set_text_entry("")
         self.profile.load_profile(self.filepath)
         self.profile.contact_messages.append(message)
+        self.profile.save_profile(self.filepath)
 
     def add_contact(self):
         global profile
@@ -175,18 +185,23 @@ class MainApp(tk.Frame):
         self.body.insert_contact(new_contact)
         self.profile.load_profile(self.filepath)
         profile.contacts.append(new_contact)
+        self.profile.save_profile(self.filepath)
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
 
     def recipient_selected(self, recipient):
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         self.recipient = recipient
-        message_list = self.direct_messenger.retrieve_all()
-        for message in message_list:
-            self.body.insert_contact_message(message)
-            self.profile.contact_messages.append(message)
-        
+        if self.recipient not in profile.contacts:
+            profile.contacts.append(self.recipient)
+        else:
+            message_list = self.direct_messenger.retrieve_all()
+            for message in message_list:
+                self.body.insert_contact_message(message.message)
+                self.profile.contact_messages.append(message.message)
+                profile.save_profile(self.filepath)
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -200,17 +215,18 @@ class MainApp(tk.Frame):
         self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
-        self.after(2500, tk.END)
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
+        self.after(2500, self.direct_messenger.retrieve_new())
         msg_list = self.direct_messenger.retrieve_new()
-        if len(msg_list) > 0:
+        if msg_list:
             for message_obj in msg_list:
                 if message_obj.recipient not in self.body._contacts:
                     self.body.insert_contact(message_obj.recipient)
                 elif message_obj.recipient == self.recipient:
                     self.body.insert_contact_message(message_obj.message)
-                self.profile.contacts.append({"friend":message_obj.recipient})
-                self.profile.contact_messages.append({self.recipient:{"message": message_obj.message, "timestamp": message_obj.timestamp}})
-                self.profile.save_profile(self.new_path)
+                self.profile.contacts.append({"contact": message_obj.recipient})
+                self.profile.contact_messages.append({self.recipient: {"message": message_obj.message, "timestamp": message_obj.timestamp}})
+                self.profile.save_profile(self.filepath)
 
     def _get_profile(self):
         profile_to_load = filedialog.askopenfile()
@@ -223,13 +239,14 @@ class MainApp(tk.Frame):
         server_from_profile = profile.dsuserver
         username_from_profile = profile.username
         password_from_profile = profile.password
+        self.contacts = profile.contacts
         self.server = server_from_profile
         self.username = username_from_profile
         self.password = password_from_profile
 
     def _new_profile(self):
         folder_to_load = filedialog.askdirectory()
-        terminal_time = tk.Label(master=self, text="Please return to the terminal to create your profile.")
+        terminal_time = tk.Label(master=self, text="Please check the terminal to create your profile.")
         terminal_time.pack()
         file_name = input("Please input a filename.")
         filepath = f"{folder_to_load}" + f"\\{file_name}.dsu"
@@ -277,6 +294,7 @@ class MainApp(tk.Frame):
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
+
 def main():
     main = tk.Tk()
 
@@ -285,7 +303,7 @@ def main():
 
     # This is just an arbitrary starting point. You can change the value
     # around to see how the starting size of the window changes.
-    main.geometry("1024x700")
+    main.geometry("800x360")
 
     # adding this option removes some legacy behavior with menus that
     # some modern OSes don't support. If you're curious, feel free to comment
@@ -311,6 +329,7 @@ def main():
     # And finally, start up the event loop for the program (you can find
     # more on this in lectures of week 9 and 10).
     main.mainloop()
+
 
 if __name__ == "__main__":
     main()

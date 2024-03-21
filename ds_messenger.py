@@ -24,17 +24,18 @@ class DirectMessenger:
         self.port = 3021
 
     def send(self, message:str, recipient:str) -> bool:
+        dm_attempt = dsp.directmessage(message, recipient, self.dsuserver, self.username, self.password)
         try:
-            dm_attempt = dsp.directmessage(message, recipient, self.dsuserver, self.username, self.password)
-            print(dm_attempt[0])
-            self.token = dm_attempt[1]
-            return True
-        except:
+            if type(dm_attempt) != None:
+                print(dm_attempt[0])
+                self.token = dm_attempt[1]
+                return True
+        except TypeError:
             print("Error with sending direct message through messenger.")
             return False
 
     def retrieve_new(self) -> list:
-        #try:
+        try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))
                 join_msg = dsc.join(client_socket, self.username, self.password)
@@ -60,8 +61,8 @@ class DirectMessenger:
                         i += 1
                         msg_list.append(new_msg)
                     return msg_list
-        #except:
-            print(f"Error retrieving the new messages.")
+        except:
+            print("Error retrieving the new messages.")
             return []
 
     def retrieve_all(self) -> list:
@@ -76,17 +77,11 @@ class DirectMessenger:
                 recv = client_socket.makefile('r')
                 sendfile.write(json.dumps(message) + "\r\n")
                 sendfile.flush()
-                # print("Successfully sent info")
-
-                #server_response = client_socket.recv(2048).decode('utf-8')
                 response = recv.readline()
                 server_response = json.loads(response)
-                # print(response)
-                # print("Successfully retrieved server response.")
 
                 if server_response["response"]["type"] == 'ok':
                     all_messages = server_response["response"]["messages"]
-                    #print(all_messages)
                     msg_list = []
                     i = 0
                     for msg in all_messages:
@@ -101,17 +96,5 @@ class DirectMessenger:
                     print(f"Error: {server_response['response']['message']}")
                     return []
         except:
-            print(f"Error retrieving all messages.")
+            print("Error retrieving all messages.")
             return []
-
-if __name__ == "__main__":
-    dm_time2 = DirectMessenger("168.235.86.101", "strawberry", "banana")
-    #print("Class instantiated")
-    input = input("What do you want to send to teatime?")
-    dm_time2.send(input, "teatime")
-    all_msgs = dm_time2.retrieve_all()
-    print(all_msgs)
-
-    dm_time1 = DirectMessenger("168.235.86.101", "teatime", "iceecream")
-    all_msgs = dm_time1.retrieve_all()
-    print(all_msgs)
