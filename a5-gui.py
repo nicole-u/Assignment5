@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, simpledialog
 from ds_messenger import DirectMessenger
 from typing import Text
 
@@ -8,7 +8,7 @@ class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
-        self._contacts = [str]
+        self._contacts = []
         self._select_callback = recipient_selected_callback
         # After all initialization is complete,
         # call the _draw method to pack the widgets
@@ -69,7 +69,7 @@ class Body(tk.Frame):
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5, bg="#aaf0ec", font="bahnschrift 12")
+        self.entry_editor = tk.Text(editor_frame, width=0, height=5, bg="#b0d6d4", font="bahnschrift 12")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
@@ -168,12 +168,12 @@ class MainApp(tk.Frame):
         self.direct_messenger.send()
 
     def add_contact(self):
-        
+        new_contact = simpledialog.askstring("New contact:", "Please enter the new contact's name")
+        Body.insert_contact(Body, new_contact)
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
-        pass
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
@@ -199,16 +199,16 @@ class MainApp(tk.Frame):
         self.root['menu'] = menu_bar
         menu_file = tk.Menu(menu_bar)
 
-        menu_bar.add_cascade(menu=menu_file, label='File')
-        menu_file.add_command(label='New')
-        menu_file.add_command(label='Open...')
-        menu_file.add_command(label='Close')
+        menu_bar.add_cascade(menu=menu_file, label='File', background="black")
+        menu_file.add_command(label='New', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b")
+        menu_file.add_command(label='Open...', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b")
+        menu_file.add_command(label='Close', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b", command=quit)
 
-        settings_file = tk.Menu(menu_bar)
-        menu_bar.add_cascade(menu=settings_file, label='Settings')
-        settings_file.add_command(label='Add Contact',
+        settings_file = tk.Menu(menu_bar, background="black")
+        menu_bar.add_cascade(menu=settings_file, label='Settings', background="black")
+        settings_file.add_command(label='Add Contact', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b",
                                   command=self.add_contact)
-        settings_file.add_command(label='Configure DS Server',
+        settings_file.add_command(label='Configure DS Server', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b",
                                   command=self.configure_server)
 
         # The Body and Footer classes must be initialized and
@@ -216,7 +216,7 @@ class MainApp(tk.Frame):
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.publish)
+        self.footer = Footer(self.root, send_callback=self.publish())
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 

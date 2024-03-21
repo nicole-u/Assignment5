@@ -114,6 +114,7 @@ class Profile:
         self.password = password  # REQUIRED
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
+        self._contacts = []
 
     def add_post(self, post: Post) -> None:
         """

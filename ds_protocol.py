@@ -94,8 +94,6 @@ def directmessage(dm, recipient, dsuserver, user, pwd):
         sendfile.flush()
         server_resp = json.loads(recv.readline())
         if server_resp["response"]["type"] == "ok":
-            return "Direct message successfuly sent", msg_token
+            return "Direct message successfully sent", msg_token
         else:
             print("Error sending direct message.")
-
-#directmessage("Hello world", "ohhimark", "168.235.86.101", "strawberry", "banana")

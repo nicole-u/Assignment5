@@ -241,4 +241,7 @@ def post_online(path, filename, post: str):
         dsc.send(server, DSU_PORT, current_user, current_pwd, transcluded_post)
 
 def direct_message():
+    """
+    Handles all communication with tkinter and messenger.
+    """
     pass
