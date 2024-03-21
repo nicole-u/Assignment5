@@ -115,6 +115,7 @@ class Profile:
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
         self._contacts = []
+        self._contact_messages = []
 
     def add_post(self, post: Post) -> None:
         """

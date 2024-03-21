@@ -31,13 +31,16 @@ def extract_json(json_msg: str) -> DataTuple:
     try:
         json_obj = json.loads(json_msg)
         msg_type = json_obj['response']['type']
-        message = json_obj['response']['message']
         if msg_type == "ok":
             msg_token = json_obj['response']['token']
+            message = json_obj['response']['message']
         else:
+            message = ""
             msg_token = ""
     except json.JSONDecodeError:
         print("Json cannot be decoded.")
+    except KeyError:
+        print("JSON could not be extracted.")
     return DataTuple(msg_type, message, msg_token)
 
 def extract_json_to_list(json_msg: str):
@@ -81,19 +84,20 @@ def _join(client_socket: socket, user: str, pwd: str):
     return extracted_msg
 
 def directmessage(dm, recipient, dsuserver, user, pwd):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        client.connect((dsuserver, 3021))
-        server_msg = _join(client, user, pwd)
-        msg_token = server_msg[2]
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+            client.connect((dsuserver, 3021))
+            server_msg = _join(client, user, pwd)
+            msg_token = server_msg[2]
 
-        timestamp = str(time.time())
-        formatted_post = {"token": msg_token, "directmessage": {"entry": dm, "recipient": recipient, "timestamp": timestamp}}
-        sendfile = client.makefile('w')
-        recv = client.makefile('r')
-        sendfile.write(json.dumps(formatted_post) + "\r\n")
-        sendfile.flush()
-        server_resp = json.loads(recv.readline())
-        if server_resp["response"]["type"] == "ok":
-            return "Direct message successfully sent", msg_token
-        else:
-            print("Error sending direct message.")
+            timestamp = str(time.time())
+            formatted_post = {"token": msg_token, "directmessage": {"entry": dm, "recipient": recipient, "timestamp": timestamp}}
+            sendfile = client.makefile('w')
+            recv = client.makefile('r')
+            sendfile.write(json.dumps(formatted_post) + "\r\n")
+            sendfile.flush()
+            server_resp = json.loads(recv.readline())
+            if server_resp["response"]["type"] == "ok":
+                return "Direct message successfully sent", msg_token
+    except:
+        return "Error with sending direct message."

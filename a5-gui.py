@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, simpledialog
 from ds_messenger import DirectMessenger
 from typing import Text
+from Profile import Profile
 
 
 class Body(tk.Frame):
@@ -45,7 +46,7 @@ class Body(tk.Frame):
         self.message_editor.insert(1.0, text)
 
     def _draw(self):
-        posts_frame = tk.Frame(master=self, width=250, bg="#3ba39e")
+        posts_frame = tk.Frame(master=self, width=250, background="#3ba39e")
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         self.posts_tree = ttk.Treeview(posts_frame)
@@ -165,11 +166,14 @@ class MainApp(tk.Frame):
         self.body.insert_contact("studentexw23") # adding one example student.
 
     def send_message(self):
-        self.direct_messenger.send()
+        message = self.body.get_text_entry()
+        self.direct_messenger.send(message, self.recipient)
+        self.body.insert_user_message(message)
+        self.body.set_text_entry("")
 
     def add_contact(self):
         new_contact = simpledialog.askstring("New contact:", "Please enter the new contact's name")
-        Body.insert_contact(Body, new_contact)
+        self.body.insert_contact(new_contact)
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
@@ -191,7 +195,18 @@ class MainApp(tk.Frame):
 
     def check_new(self):
         print(self.after(5000, self.direct_messenger.retrieve_new()))
-        pass
+    
+    def _get_profile(self):
+        profile_to_load = filedialog.askopenfile()
+        filepath = str(profile_to_load.name)
+        profile = Profile()
+        profile.load_profile(filepath)
+        server_from_profile = profile.dsuserver
+        username_from_profile = profile.username
+        password_from_profile = profile.password
+        self.server = server_from_profile
+        self.username = username_from_profile
+        self.password = password_from_profile
 
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -201,7 +216,7 @@ class MainApp(tk.Frame):
 
         menu_bar.add_cascade(menu=menu_file, label='File', background="black")
         menu_file.add_command(label='New', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b")
-        menu_file.add_command(label='Open...', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b")
+        menu_file.add_command(label='Open...', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b", command=self._get_profile)
         menu_file.add_command(label='Close', background="#b0d6d4", font="bahnschrift 10", activebackground="#195e5b", command=quit)
 
         settings_file = tk.Menu(menu_bar, background="black")
@@ -216,7 +231,7 @@ class MainApp(tk.Frame):
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.publish())
+        self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 
