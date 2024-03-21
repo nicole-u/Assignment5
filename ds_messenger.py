@@ -8,7 +8,11 @@ from Profile import *
 
 profile = Profile()
 
+
 class DirectMessage:
+    """
+    Class that a Direct Message is instantiated with.
+    """
     def __init__(self):
         self.recipient = None
         self.message = None
@@ -16,6 +20,9 @@ class DirectMessage:
 
 
 class DirectMessenger:
+    """
+    The messenger.
+    """
     def __init__(self, dsuserver=None, username=None, password=None):
         self.token = None
         self.dsuserver = dsuserver
@@ -23,10 +30,13 @@ class DirectMessenger:
         self.password = password
         self.port = 3021
 
-    def send(self, message:str, recipient:str) -> bool:
+    def send(self, message: str, recipient: str) -> bool:
+        """
+        Function to send
+        """
         dm_attempt = dsp.directmessage(message, recipient, self.dsuserver, self.username, self.password)
         try:
-            if type(dm_attempt) != None:
+            if type(dm_attempt) is not None:
                 print(dm_attempt[0])
                 self.token = dm_attempt[1]
                 return True
@@ -35,6 +45,9 @@ class DirectMessenger:
             return False
 
     def retrieve_new(self) -> list:
+        """
+        Function to retrieve new messages
+        """
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))
@@ -66,6 +79,9 @@ class DirectMessenger:
             return []
 
     def retrieve_all(self) -> list:
+        """
+        Function to retrieve all messages
+        """
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))

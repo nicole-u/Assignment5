@@ -21,35 +21,63 @@ class Body(tk.Frame):
         self._draw()
 
     def node_select(self, event):
+        """
+        Function to help with node selection
+        """
         index = int(self.posts_tree.selection()[0])
         entry = self._contacts[index]
         if self._select_callback is not None:
             self._select_callback(entry)
 
     def insert_contact(self, contact: str):
+        """
+        Function that takes care of inserting a contact
+        into the GUI
+        """
         self._contacts.append(contact)
         id = len(self._contacts) - 1
         self._insert_contact_tree(id, contact)
 
     def _insert_contact_tree(self, id, contact: str):
+        """
+        Function that inserts the contact tree
+        """
         if len(contact) > 25:
             entry = contact[:24] + "..."
         id = self.posts_tree.insert('', id, id, text=contact)
 
     def insert_user_message(self, message: str):
+        """
+        Function that inserts the user message into the box
+        """
         self.entry_editor.insert(tk.END, message + '\n', 'entry-right')
 
     def insert_contact_message(self, message: str):
+        """
+        Function that inserts the contact message into the box
+        """
         self.entry_editor.insert(tk.END, message + '\n', 'entry-left')
 
     def get_text_entry(self) -> str:
+        """
+        Function that gets the message from the editor
+        """
         return self.message_editor.get('1.0', 'end').rstrip()
 
     def set_text_entry(self, text: str):
+        """
+        Function that sets the text entry back to empty
+        """
         self.message_editor.delete(1.0, tk.END)
         self.message_editor.insert(1.0, text)
 
+    def empty_editor(self):
+        self.entry_editor.delete(1.0, tk.END)
+
     def _draw(self):
+        """
+        Function that draws all the things to tkinter
+        """
         posts_frame = tk.Frame(master=self, width=250, background="#3ba39e")
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
@@ -72,7 +100,7 @@ class Body(tk.Frame):
         message_frame = tk.Frame(master=self, bg="#3ba39e")
         message_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
-        self.message_editor = tk.Text(message_frame, width=0, height=5, bg="#cbf2ee", font="bahnschrift 12")
+        self.message_editor = tk.Text(message_frame, width=0, height=5, bg="#cbf2ee", blockcursor=True, font="bahnschrift 12")
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
@@ -90,6 +118,9 @@ class Body(tk.Frame):
 
 
 class Footer(tk.Frame):
+    """
+    Class that instantiates the footer.
+    """
     def __init__(self, root, send_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
@@ -97,14 +128,17 @@ class Footer(tk.Frame):
         self._draw()
 
     def send_click(self):
+        """
+        Function that calls back when the button is pushed.
+        """
         if self._send_callback is not None:
             self._send_callback()
 
     def _draw(self):
+        """
+        Function that draws in the footer.
+        """
         save_button = tk.Button(master=self, text="Send", width=12, bg="#195e5b", fg="white", font="bahnschrift 10", command=self.send_click)
-        # You must implement this.
-        # Here you must configure the button to bind its click to
-        # the send_click() function.
         save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
         self.footer_label = tk.Label(master=self, bg="#cbf2ee", text="Ready.", font="bahnschrift 10")
@@ -112,6 +146,9 @@ class Footer(tk.Frame):
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
+    """
+    Class that creates a dialog when adding a contact.
+    """
     def __init__(self, root, title=None, user=None, pwd=None, server=None):
         self.root = root
         self.server = server
@@ -120,6 +157,9 @@ class NewContactDialog(tk.simpledialog.Dialog):
         super().__init__(root, title)
 
     def body(self, frame):
+        """
+        Class that takes care of the configuration
+        """
         self.server_label = tk.Label(frame, width=30, text="DS Server Address", bg="#b0d6d4")
         self.server_label.pack()
         self.server_entry = tk.Entry(frame, width=30)
@@ -140,12 +180,18 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.password_entry.pack()
 
     def apply(self):
+        """
+        Takes the username, password, and server from the entries
+        """
         self.user = self.username_entry.get()
         self.pwd = self.password_entry.get()
         self.server = self.server_entry.get()
 
 
 class MainApp(tk.Frame):
+    """
+    Class that handles main work
+    """
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
@@ -155,13 +201,6 @@ class MainApp(tk.Frame):
         self.recipient = None
         self._get_profile()
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
-        # You must implement this! You must configure and
-        # instantiate your DirectMessenger instance after this line.
-        # self.direct_messenger = ... continue!
-
-        # After all initialization is complete,
-        # call the _draw method to pack the widgets
-        # into the root frame
         self._draw()
         profile.load_profile(self.filepath)
         for contact in self.contacts:
@@ -169,6 +208,9 @@ class MainApp(tk.Frame):
         self.body.insert_contact("studentexw23")  # adding one example student.
 
     def send_message(self):
+        """
+        Function responsible for sending messages.
+        """
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         message = self.body.get_text_entry()
         # print(message)
@@ -180,6 +222,9 @@ class MainApp(tk.Frame):
         self.profile.save_profile(self.filepath)
 
     def add_contact(self):
+        """
+        Function responsible for adding contacts.
+        """
         global profile
         new_contact = simpledialog.askstring("New contact:", "Please enter the new contact's name")
         self.body.insert_contact(new_contact)
@@ -192,9 +237,13 @@ class MainApp(tk.Frame):
         # methods to add the contact to your contact list
 
     def recipient_selected(self, recipient):
+        """
+        Function responsible for getting messages when clicked.
+        """
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         self.recipient = recipient
         if self.recipient not in profile.contacts:
+            Body.empty_editor()
             profile.contacts.append(self.recipient)
         else:
             message_list = self.direct_messenger.retrieve_all()
@@ -204,6 +253,9 @@ class MainApp(tk.Frame):
                 profile.save_profile(self.filepath)
 
     def configure_server(self):
+        """
+        Function responsible for configuring server.
+        """
         ud = NewContactDialog(self.root, "Configure Account",
                               self.username, self.password, self.server)
         self.username = ud.user
@@ -212,9 +264,15 @@ class MainApp(tk.Frame):
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
 
     def publish(self, message: str):
+        """
+        Function responsible for publishing.
+        """
         self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
+        """
+        Function responsible for checking for new messages.
+        """
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         self.after(2500, self.direct_messenger.retrieve_new())
         msg_list = self.direct_messenger.retrieve_new()
@@ -229,6 +287,9 @@ class MainApp(tk.Frame):
                 self.profile.save_profile(self.filepath)
 
     def _get_profile(self):
+        """
+        Function to get profile info.
+        """
         profile_to_load = filedialog.askopenfile()
         filepath = str(profile_to_load.name)
         global profile
@@ -245,6 +306,9 @@ class MainApp(tk.Frame):
         self.password = password_from_profile
 
     def _new_profile(self):
+        """
+        Function to create new profile in GUI
+        """
         folder_to_load = filedialog.askdirectory()
         terminal_time = tk.Label(master=self, text="Please check the terminal to create your profile.")
         terminal_time.pack()
@@ -269,6 +333,9 @@ class MainApp(tk.Frame):
         print(f"{filepath} created.\n")
 
     def _draw(self):
+        """
+        Function that builds the menu
+        """
         # Build a menu and add it to the root frame.
         menu_bar = tk.Menu(self.root)
         self.root['menu'] = menu_bar

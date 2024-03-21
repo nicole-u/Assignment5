@@ -25,7 +25,7 @@ DataTuple = namedtuple('DataTuple', ['type', 'message', 'token'])
 
 def extract_json(json_msg: str) -> DataTuple:
     '''
-    Call the json.loads function on a json string 
+    Call the json.loads function on a json string
     and convert it to a DataTuple object
     '''
     try:
@@ -43,9 +43,10 @@ def extract_json(json_msg: str) -> DataTuple:
         print("JSON could not be extracted.")
     return DataTuple(msg_type, message, msg_token)
 
+
 def extract_json_to_list(json_msg: str):
     '''
-    Call the json.loads function on a json string 
+    Call the json.loads function on a json string
     and convert it to a list
     '''
     json_info = []
@@ -59,6 +60,7 @@ def extract_json_to_list(json_msg: str):
     except json.JSONDecodeError:
         print("Json cannot be decoded.")
     return json_info
+
 
 def _join(client_socket: socket, user: str, pwd: str):
     """
@@ -78,6 +80,7 @@ def _join(client_socket: socket, user: str, pwd: str):
     # print(extracted_msg)
     # print("Token:" + token)
     return extracted_msg
+
 
 def directmessage(dm, recipient, dsuserver, user, pwd):
     try:
