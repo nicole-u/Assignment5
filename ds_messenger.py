@@ -3,6 +3,7 @@ import json
 import time
 from pathlib import Path
 import ds_protocol as dsp
+import ds_client as dsc
 from Profile import *
 
 profile = Profile()
@@ -29,14 +30,15 @@ class DirectMessenger:
             self.token = dm_attempt[1]
             return True
         except:
-            print("Error with sending direct message.")
+            print("Error with sending direct message through messenger.")
             return False
 
     def retrieve_new(self) -> list:
-        #try:
+        try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))
-
+                join_msg = dsc.join(client_socket, self.username, self.password)
+                self.token = join_msg[2]
                 message = {"token": self.token, "directmessage": "new"}
 
                 sendfile = client_socket.makefile('w')
@@ -58,7 +60,7 @@ class DirectMessenger:
                         i += 1
                         msg_list.append(new_msg)
                     return msg_list
-        #except:
+        except:
             print(f"Error retrieving new messages.")
             return []
 
@@ -66,8 +68,8 @@ class DirectMessenger:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))
-                # print("Connection established")
-
+                join_msg = dsc.join(client_socket, self.username, self.password)
+                self.token = join_msg[2]
                 message = {"token": self.token, "directmessage": "all"}
 
                 sendfile = client_socket.makefile('w')

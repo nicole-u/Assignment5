@@ -114,8 +114,20 @@ class Profile:
         self.password = password  # REQUIRED
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
-        self._contacts = []
-        self._contact_messages = []
+        self.contacts = []
+        self.contact_messages = {}
+
+    def add_message(self, message: str, recipient: str):    # stores messages to profile
+        if recipient in self.contact_messages:
+            self.contact_messages[recipient].append(message)
+        else:
+            self.contact_messages[recipient] = [message]
+
+    def get_messages(self, recipient: str):     # gets messages in the current profile
+        if recipient in self.contact_messages:
+            return self.contact_messages[recipient]
+        else:
+            return []
 
     def add_post(self, post: Post) -> None:
         """

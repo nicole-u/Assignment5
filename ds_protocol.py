@@ -52,14 +52,10 @@ def extract_json_to_list(json_msg: str):
     try:
         json_obj = json.loads(json_msg)
         msg_type = json_obj['response']['type']
-        message = json_obj['response']['message']
-        if msg_type == "ok":
-            msg_token = json_obj['response']['token']
-        else:
-            msg_token = ""
-        json_info.append(msg_token)
+        messages = json_obj['response']['messages']
         json_info.append(msg_type)
-        json_info.append(message)
+        for message in messages:
+            json_info.append(message)
     except json.JSONDecodeError:
         print("Json cannot be decoded.")
     return json_info
@@ -100,4 +96,5 @@ def directmessage(dm, recipient, dsuserver, user, pwd):
             if server_resp["response"]["type"] == "ok":
                 return "Direct message successfully sent", msg_token
     except:
-        return "Error with sending direct message."
+        print("Error with sending message through protocol.")
+        return False

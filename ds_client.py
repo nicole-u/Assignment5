@@ -28,7 +28,7 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
             client_socket.connect((server, port))
             response_msg = join(client_socket, username, password)
             msg_type = response_msg[0]
-            token = response_msg[1]
+            token = response_msg[2]
             if msg_type == "ok":
                 print("Connection successful")
                 if bio is None:
