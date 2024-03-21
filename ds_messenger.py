@@ -34,7 +34,7 @@ class DirectMessenger:
             return False
 
     def retrieve_new(self) -> list:
-        try:
+        #try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((self.dsuserver, 3021))
                 join_msg = dsc.join(client_socket, self.username, self.password)
@@ -48,7 +48,7 @@ class DirectMessenger:
 
                 server_response = recv.readline()
                 response = json.loads(server_response)
-                if server_response["response"]["type"] == 'ok':
+                if response["response"]["type"] == 'ok':
                     all_messages = response["response"]["messages"]
                     msg_list = []
                     i = 0
@@ -60,8 +60,8 @@ class DirectMessenger:
                         i += 1
                         msg_list.append(new_msg)
                     return msg_list
-        except:
-            print(f"Error retrieving new messages.")
+        #except:
+            print(f"Error retrieving the new messages.")
             return []
 
     def retrieve_all(self) -> list:

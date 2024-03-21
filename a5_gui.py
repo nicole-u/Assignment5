@@ -167,13 +167,14 @@ class MainApp(tk.Frame):
         self.body.insert_user_message(message)
         self.body.set_text_entry("")
         self.profile.load_profile(self.filepath)
-        self.profile._contact_messages.append(message)
+        self.profile.contact_messages.append(message)
 
     def add_contact(self):
+        global profile
         new_contact = simpledialog.askstring("New contact:", "Please enter the new contact's name")
         self.body.insert_contact(new_contact)
         self.profile.load_profile(self.filepath)
-        self.profile._contacts.append(new_contact)
+        profile.contacts.append(new_contact)
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
@@ -184,7 +185,7 @@ class MainApp(tk.Frame):
         message_list = self.direct_messenger.retrieve_all()
         for message in message_list:
             self.body.insert_contact_message(message)
-            self.profile._contact_messages.append(message)
+            self.profile.contact_messages.append(message)
         
 
     def configure_server(self):
@@ -199,12 +200,22 @@ class MainApp(tk.Frame):
         self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
-        print(self.after(5000, self.direct_messenger.retrieve_new()))
-        self.profile._contact_messages.append(self.direct_messenger.retrieve_new())
+        self.after(2500, tk.END)
+        msg_list = self.direct_messenger.retrieve_new()
+        if len(msg_list) > 0:
+            for message_obj in msg_list:
+                if message_obj.recipient not in self.body._contacts:
+                    self.body.insert_contact(message_obj.recipient)
+                elif message_obj.recipient == self.recipient:
+                    self.body.insert_contact_message(message_obj.message)
+                self.profile.contacts.append({"friend":message_obj.recipient})
+                self.profile.contact_messages.append({self.recipient:{"message": message_obj.message, "timestamp": message_obj.timestamp}})
+                self.profile.save_profile(self.new_path)
 
     def _get_profile(self):
         profile_to_load = filedialog.askopenfile()
         filepath = str(profile_to_load.name)
+        global profile
         profile = Profile()
         profile.load_profile(filepath)
         self.filepath = filepath

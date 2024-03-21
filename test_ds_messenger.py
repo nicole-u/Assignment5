@@ -22,9 +22,11 @@ class test_messenger(unittest.TestCase):
         messenger.send("Hello world!!", "teatime")
         retrieveall_msger = DirectMessenger(dsuserver='168.235.86.101', username='teatime', password='iceecream')
         all_msgs = retrieveall_msger.retrieve_all()
-        print(all_msgs)
+        first_msg = all_msgs[0]
+        assert type(first_msg.message) == str
 
     def test_retrieve_new(self):
-        pass
-
-test_messenger.test_retrieve_all(test_messenger)
+        messenger.send("Hello again", "teatime")
+        retrievenew_msger = DirectMessenger(dsuserver='168.235.86.101', username='teatime', password='iceecream')
+        new_msgs = retrievenew_msger.retrieve_new()
+        assert type(new_msgs[0].message) == str

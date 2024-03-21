@@ -115,7 +115,7 @@ class Profile:
         self.bio = ''            # OPTIONAL
         self._posts = []         # OPTIONAL
         self.contacts = []
-        self.contact_messages = {}
+        self.contact_messages = []
 
     def add_message(self, message: str, recipient: str):    # stores messages to profile
         if recipient in self.contact_messages:
